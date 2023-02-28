@@ -6,12 +6,10 @@ var connection = mysql.createConnection({
     database: 'quizapp'
 });
 
-const connectDB = async () => {
-    connection.connect(function(err) {
+conn = connection.connect(function(err) {
     if (err) throw err;
     console.log("Connected successfully ");
 });
-}
 
 
 module.exports = connectDB;
