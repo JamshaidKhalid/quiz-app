@@ -8,10 +8,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "admin",
-  database: "quizapp",
+  host: "us-cdbr-iron-east-02.cleardb.net",
+  user: "b7e2437887xxxa",
+  password: "0200xxx6",
+  database: "heroku_7643ec736354xxx",
 });
 
 conn = connection.connect(function (err) {
