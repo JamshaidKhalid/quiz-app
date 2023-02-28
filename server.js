@@ -42,14 +42,45 @@ app.post("/quizzes", function (req, res) {
   );
 });
 
-
 //   GET /quizzes/:quizId/questions: Returns a list of questions for the quiz with the provided quizId parameter.
 app.get("/quizzes/:quizId/questions", function (req, res) {
-    const quizId = req.params.quizId;
+  const quizId = req.params.quizId;
+
+  connection.query(
+    "SELECT * FROM questions WHERE quiz_id = ?",
+    quizId,
+    function (error, results, fields) {
+      if (error) throw error;
+      res.send(results);
+    }
+  );
+});
+
+// POST /quizzes/:quizId/questions: Creates a new question for the quiz with the provided quizId parameter, with the question text and is_mandatory flag provided in the request body.
+app.post("/quizzes/:quizId/questions", function (req, res) {
+  const quizId = req.params.quizId;
+  const questionText = req.body.question_text;
+  const isMandatory = req.body.is_mandatory || false;
+
+  connection.query(
+    "INSERT INTO questions (quiz_id, question_text, is_mandatory) VALUES (?, ?, ?)",
+    [quizId, questionText, isMandatory],
+    function (error, results, fields) {
+      if (error) throw error;
+      res.send(
+        `Question with ID ${results.insertId} has been created for Quiz with ID ${quizId}.`
+      );
+    }
+  );
+});
+
+//GET /questions/:questionId/options: Returns a list of options for the question with the provided questionId parameter.
+app.get("/questions/:questionId/options", function (req, res) {
+    const questionId = req.params.questionId;
   
     connection.query(
-      "SELECT * FROM questions WHERE quiz_id = ?",
-      quizId,
+      "SELECT * FROM options WHERE question_id = ?",
+      questionId,
       function (error, results, fields) {
         if (error) throw error;
         res.send(results);
@@ -57,24 +88,25 @@ app.get("/quizzes/:quizId/questions", function (req, res) {
     );
   });
   
-  // POST /quizzes/:quizId/questions: Creates a new question for the quiz with the provided quizId parameter, with the question text and is_mandatory flag provided in the request body.
-  app.post("/quizzes/:quizId/questions", function (req, res) {
-    const quizId = req.params.quizId;
-    const questionText = req.body.question_text;
-    const isMandatory = req.body.is_mandatory || false;
+  // POST /questions/:questionId/options: Creates a new option for the question with the provided questionId parameter, with the option text provided in the request body.
+  app.post("/questions/:questionId/options", function (req, res) {
+    const questionId = req.params.questionId;
+    const optionText = req.body.option_text;
   
     connection.query(
-      "INSERT INTO questions (quiz_id, question_text, is_mandatory) VALUES (?, ?, ?)",
-      [quizId, questionText, isMandatory],
+      "INSERT INTO options (question_id, option_text) VALUES (?, ?)",
+      [questionId, optionText],
       function (error, results, fields) {
         if (error) throw error;
         res.send(
-          `Question with ID ${results.insertId} has been created for Quiz with ID ${quizId}.`
+          `Option with ID ${results.insertId} has been created for Question with ID ${questionId}.`
         );
       }
     );
   });
   
+
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
