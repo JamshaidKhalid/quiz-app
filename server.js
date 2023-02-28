@@ -76,36 +76,74 @@ app.post("/quizzes/:quizId/questions", function (req, res) {
 
 //GET /questions/:questionId/options: Returns a list of options for the question with the provided questionId parameter.
 app.get("/questions/:questionId/options", function (req, res) {
-    const questionId = req.params.questionId;
-  
-    connection.query(
-      "SELECT * FROM options WHERE question_id = ?",
-      questionId,
-      function (error, results, fields) {
-        if (error) throw error;
-        res.send(results);
-      }
-    );
-  });
-  
-  // POST /questions/:questionId/options: Creates a new option for the question with the provided questionId parameter, with the option text provided in the request body.
-  app.post("/questions/:questionId/options", function (req, res) {
-    const questionId = req.params.questionId;
-    const optionText = req.body.option_text;
-  
-    connection.query(
-      "INSERT INTO options (question_id, option_text) VALUES (?, ?)",
-      [questionId, optionText],
-      function (error, results, fields) {
-        if (error) throw error;
-        res.send(
-          `Option with ID ${results.insertId} has been created for Question with ID ${questionId}.`
-        );
-      }
-    );
-  });
-  
+  const questionId = req.params.questionId;
 
+  connection.query(
+    "SELECT * FROM options WHERE question_id = ?",
+    questionId,
+    function (error, results, fields) {
+      if (error) throw error;
+      res.send(results);
+    }
+  );
+});
+
+// POST /questions/:questionId/options: Creates a new option for the question with the provided questionId parameter, with the option text provided in the request body.
+app.post("/questions/:questionId/options", function (req, res) {
+  const questionId = req.params.questionId;
+  const optionText = req.body.option_text;
+
+  connection.query(
+    "INSERT INTO options (question_id, option_text) VALUES (?, ?)",
+    [questionId, optionText],
+    function (error, results, fields) {
+      if (error) throw error;
+      res.send(
+        `Option with ID ${results.insertId} has been created for Question with ID ${questionId}.`
+      );
+    }
+  );
+});
+
+//   POST /quizzes/:quizId/submissions: Creates a new quiz submission for the quiz with the provided quizId parameter.
+app.post("/quizzes/:quizId/submissions", function (req, res) {
+  const quizId = req.params.quizId;
+
+  connection.query(
+    "INSERT INTO quiz_submissions (quiz_id) VALUES (?)",
+    quizId,
+    function (error, results, fields) {
+      if (error) throw error;
+      res.send(
+        `Quiz submission with ID ${results.insertId} has been created for Quiz with ID ${quizId}.`
+      );
+    }
+  );
+});
+
+//   POST /submissions/:submissionId/answers: Creates a new answer for the quiz submission with the provided submissionId parameter.
+app.post("/submissions/:submissionId/answers", function (req, res) {
+  const submissionId = req.params.submissionId;
+  const questionId = req.body.question_id;
+  const optionId = req.body.option_id;
+
+
+  if (!questionId) {
+    res.status(400).send("Question ID is required.");
+    return;
+  }
+
+  connection.query(
+    "INSERT INTO student_answers (quiz_submission_id, question_id, option_id) VALUES (?, ?, ?)",
+    [submissionId, questionId, optionId],
+    function (error, results, fields) {
+      if (error) throw error;
+      res.send(
+        `Answer with ID ${results.insertId} has been added for Quiz Submission with ID ${submissionId} and Question with ID ${questionId}.`
+      );
+    }
+  );
+});
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
