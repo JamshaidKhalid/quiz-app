@@ -27,7 +27,20 @@ app.get("/quizzes", function (req, res) {
   });
 });
 
-
+// POST /quizzes: Creates a new quiz with the provided title and description in the request body.
+app.post("/quizzes", function (req, res) {
+    const title = req.body.title;
+    const description = req.body.description;
+  
+    connection.query(
+      "INSERT INTO quizzes (title, description) VALUES (?, ?)",
+      [title, description],
+      function (error, results, fields) {
+        if (error) throw error;
+        res.send(`Quiz with ID ${results.insertId} has been created.`);
+      }
+    );
+  });
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
