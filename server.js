@@ -1,13 +1,16 @@
-//conncet mysql
-var mysql = require('mysql');
-var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'admin',
-});
+const express = require('express');
+const app = express();
+const router = express.Router();
+const bodyParser = require('body-parser');
+const port = 3000;
+const connection = require('./database/mysqlConnection');
 
-connection.connect(function(err) {
-    if (err) throw err;
-    console.log("connected successfully ");
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+connection()
+
+app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`);
 });
 
